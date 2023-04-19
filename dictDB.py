@@ -98,7 +98,7 @@ class DB():
             Updates in-memory database dictionary with .jsons
         '''
         for filename in os.listdir('db'):
-            user = filename[:-5]
+            user = os.path.splitext(filename)[0]
             with open(f"db/{filename}") as f:
                 data = json.load(f)
             self.users[user] = data
@@ -109,3 +109,15 @@ class DB():
         '''
         self.users[username] = [username, chatKey]
         self.export_JSON()
+
+    def get_chatKey(self, username, friend_name):
+        '''
+            Gets a given chatKey for a user and their friend
+        '''
+        for user, data in self.users.items():
+            if user == username:
+                for entry in data:
+                    if entry[0] == user:
+                        continue
+                    if entry[0] == friend_name:
+                        return entry[1]

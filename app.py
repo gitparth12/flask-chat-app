@@ -9,12 +9,7 @@ from flask_login import (LoginManager, current_user, login_required,
 from flask_socketio import SocketIO, join_room, leave_room
 from pymongo.errors import DuplicateKeyError
 
-from db import (add_room_members, get_messages, get_room, get_room_members,
-                get_rooms_for_user, get_user, is_room_admin, is_room_member,
-                remove_room_members, save_message, save_room, save_user,
-                update_room)
 from dictDB import DB
-from no_sql_db import DB, Table
 
 app = Flask(__name__)
 app.secret_key = "sfdjkafnk"
