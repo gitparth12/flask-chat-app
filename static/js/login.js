@@ -7,12 +7,15 @@ form.onsubmit = function(e) {
     alert(username.value);
 
     if (username.value.length && password.value.length) {
+        // set the variable in localStorage
+        localStorage.setItem('userPassword', password.value);
+
         const user_info = { "operation": "login", "username": username.value };
         var response = postData(user_info);
 
         response.then(function(result) {
             if (result['status'] === 'success') {
-                return window.location.replace("/chats");
+                return window.location.href = "/chats";
             }
             else {
                 alert("Couldn't log in, please check details and try again.");
@@ -54,9 +57,9 @@ function postData(data) {
             alert("something is wrong");
         }
     })
-    //.then((jsonResponse) => {
-    // Log the response data in the console
-    //console.log(jsonResponse);
-    //})
-    .catch((err) => console.error(err));
+        //.then((jsonResponse) => {
+        // Log the response data in the console
+        //console.log(jsonResponse);
+        //})
+        .catch((err) => console.error(err));
 }
