@@ -9,6 +9,8 @@ from flask_login import (LoginManager, current_user, login_required,
 from flask_socketio import SocketIO, join_room, leave_room
 from pymongo.errors import DuplicateKeyError
 
+from dictDB import DB
+
 from db import (add_room_members, get_messages, get_room, get_room_members,
                 get_rooms_for_user, get_user, is_room_admin, is_room_member,
                 remove_room_members, save_message, save_room, save_user,
@@ -278,6 +280,5 @@ if __name__ == "__main__":
     ####### db.create_table_entry("Egg", ["A", 12345])
     db.export_JSON()
     db.create_chats()
-    # db.message_add_test()
-    # socketio.run(app, debug=True)
+
     app.run(ssl_context="adhoc", debug=True)
