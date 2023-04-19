@@ -17,6 +17,7 @@ class DB:
         self.users["B"] = [("B", 00000), ("A", 12345)]
         self.users["C"] = [("C", 00000)]
         self.users["D"] = [("D", 00000), ("A", 67890)]
+        self.current_user = None
 
     def export_JSON(self):
         """
@@ -75,7 +76,7 @@ class DB:
             if os.path.splitext(filename)[0] == username:
                 with open("db/" + filename) as f:
                     data = json.load(f)
-                friends = [item[0] for item in data]
+                friends = [item[0] for item in data if item[0] != username]
                 print(friends)
                 return friends
         return False
@@ -103,7 +104,7 @@ class DB:
         """
         Adds a user to the in-memory db and exports to a json
         """
-        self.users[username] = [username, chatKey]
+        self.users[username] = [[username, chatKey]]
         self.export_JSON()
 
     def get_chatKey(self, username, friend_name):
@@ -113,19 +114,17 @@ class DB:
         for user, data in self.users.items():
             if user == username:
                 for entry in data:
-                    if entry[0] == user:
+                    if entry[0] == username:
                         continue
                     if entry[0] == friend_name:
                         return entry[1]
 
-                    
     def get_ownChatKey(self, username):
-        '''
-            Gets a given chatKey for a user and their friend
-        '''
+        """
+        Gets a given chatKey for a user and their friend
+        """
         for user, data in self.users.items():
             if user == username:
                 for entry in data:
-                    if entry[0] == user:
+                    if entry[0] == username:
                         return entry[1]
-                        

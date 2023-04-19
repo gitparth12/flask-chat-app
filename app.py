@@ -1,4 +1,5 @@
 import json
+import sys
 from datetime import datetime
 
 import requests
@@ -35,7 +36,8 @@ def post_fn():
     elif data["operation"] == "login":
         if db.username_valid(data["username"]):
             db.current_user = data["username"]
-            chatKey = db.get_chatKey(db.current_user, db.current_user)
+            print(db.current_user)
+            chatKey = db.get_ownChatKey(db.current_user)
             print(chatKey)
             message = {
                 "status": "success",
@@ -265,6 +267,7 @@ def load_user(username):
 
 if __name__ == "__main__":
     db = DB.get_instance()
+    db.import_JSON()
     # db.export_JSON()
     # db.message_add_test('chats/lukeandparth.json')
     # print(db.username_valid('A'))
@@ -278,4 +281,4 @@ if __name__ == "__main__":
     db.export_JSON()
     db.create_chats()
 
-    app.run(ssl_context="adhoc", debug=True)
+    app.run(ssl_context="adhoc", debug=True, port=sys.argv[1])
