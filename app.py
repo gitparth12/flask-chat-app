@@ -221,6 +221,9 @@ def get_older_messages(room_id):
     else:
         return "Room not found", 404
 
+@socketio.on("signup")
+def attempt_signup(data):
+    return render_template("index.html");
 
 @socketio.on("send_message")
 def handle_send_message_event(data):
