@@ -14,24 +14,37 @@ form.onsubmit = function(e) {
         { "make": "Jaguar", "model": "Mark VII" },
     ];
 
-    const hashed_password = CryptoJS.SHA256(password)
-    const user_info = { "username": username, "password": password };
-    
-
     if (username.value.length && password.value.length) {
-        getData();
-        postData(cars);
+        var chatKey = CryptoJS.lib.WordArray.random(16).toString();
+        var encrypted_chatKey = CryptoJS.AES.encrypt(chatKey, password.value).toString();
+        const user_info = { "username": username.value, "chatKey": encrypted_chatKey };
+        postData(user_info);
     }
 };
 
+/*
+    var response = getData();
+    response.then((result) => console.log(result['greeting']));
+    response = response.then(function(result) {
+        result['greeting'] = 'Hello from js';
+        return result;
+    });
+    response.then((result) => console.log(result['greeting']));
+*/
+
 function getData() {
-    fetch("/get")
+    return fetch("/get")
         .then(function(response) {
             return response.json();
-        }).then(function(text) {
+        })
+    /*
+        .then(function(text) {
             console.log("GET response:");
-            console.log(text.greeting);
+            // var result = text[dictKey];
+            // return result;
+            console.log("text: " + text);
         });
+    */
 }
 
 function postData(data) {
