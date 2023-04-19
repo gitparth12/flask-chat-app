@@ -109,9 +109,9 @@ class DB:
         return self.tables[table_name].create_entry(data)
 
     def export_JSON(self):
-        '''
-            Creates .json files for each user
-        '''
+        """
+        Creates .json files for each user
+        """
         for name, table in self.tables.items():
             file_path = f"db/{name}.json"
             if os.path.exists(file_path):
@@ -121,14 +121,14 @@ class DB:
                 with open(f"db/{name}.json", "x") as f:
                     f.write(table.to_json())
 
-        #if not os.path.exists('db/admin.json'):
+        # if not os.path.exists('db/admin.json'):
         #    with open(f'db/admin.json', 'x') as f:
         #        f.write('[]')
 
     def create_chats(self):
-        '''
-            Creates empty chats for hardcoded users
-        '''
+        """
+        Creates empty chats for hardcoded users
+        """
         createdchats = []
         data = {"messages": []}
         json_data = json.dumps(data, indent=2)
@@ -146,11 +146,10 @@ class DB:
                         f.write(json_data)
             createdchats.append(name)
 
-
     def message_add_test(self, filepath):
-        '''
-            A test for the formatting of the message jsons 
-        '''
+        """
+        A test for the formatting of the message jsons
+        """
         # Read the existing JSON file
         with open(filepath) as file:
             existing_data = json.load(file)
@@ -168,63 +167,61 @@ class DB:
 
         # Write the updated JSON back to the file
 
-        with open(filepath, 'w') as file:
+        with open(filepath, "w") as file:
             json.dump(existing_data, file, indent=2)
 
     def username_valid(self, username):
-        '''
-            Checks if the username exists in the db
-        '''
-        for filename in os.listdir('db/'):
+        """
+        Checks if the username exists in the db
+        """
+        for filename in os.listdir("db/"):
             if os.path.splitext(filename)[0] == username:
                 return True
         return False
-            
+
     def get_friend_list(self, username):
-        '''
-            Creates a list of a given users friends
-        '''
-        for filename in os.listdir('db/'):
+        """
+        Creates a list of a given users friends
+        """
+        for filename in os.listdir("db/"):
             if os.path.splitext(filename)[0] == username:
-                with open('db/' + filename) as f:
+                with open("db/" + filename) as f:
                     data = json.load(f)
                 friends = [item[0] for item in data]
                 print(friends)
                 return friends
         return False
-            
+
     def new_chat(self, username, friend_name):
-        '''
-            Creates a new chat between 2 users
-        '''
-        data = {
-                "messages": []
-            }
+        """
+        Creates a new chat between 2 users
+        """
+        data = {"messages": []}
         json_data = json.dumps(data, indent=2)
-        with open(f'chats/{username}and{friend_name}.json', 'w') as f:
+        with open(f"chats/{username}and{friend_name}.json", "w") as f:
             f.write(json_data)
-        
+
     def update_tables(self):
-        '''
-            Updates the in-memory db for when the client edits the .jsons
-        '''
-        for filename in os.listdir('db/'):
+        """
+        Updates the in-memory db for when the client edits the .jsons
+        """
+        for filename in os.listdir("db/"):
             username = os.path.splitext(filename)[0]
-            with open('db/' + filename) as f:
+            with open("db/" + filename) as f:
                 data = json.load(f)
                 for item in data:
                     friend_name, chatKey = item
                 self.add_table(username, "friends", "chatKey")
                 self.create_table_entry(username, [friend_name, chatKey])
-        
+
     def import_JSON(self):
-        '''
-            Reads .json files for each user and loads the data into the corresponding tables
-        '''
-        for filename in os.listdir('db/'):
+        """
+        Reads .json files for each user and loads the data into the corresponding tables
+        """
+        for filename in os.listdir("db/"):
             name, ext = os.path.splitext(filename)
-            if ext == '.json':
-                with open(f'db/{filename}', 'r') as f:
+            if ext == ".json":
+                with open(f"db/{filename}", "r") as f:
                     data = json.load(f)
                     table_fields = None
                     for table_name, table in self.tables.items():
@@ -235,6 +232,8 @@ class DB:
                         table = Table(name, *table_fields)
                         table.entries = data
                         self.tables[name] = table
-# Our global database 
+
+
+# Our global database
 # Invoke this as needed
 database = DB()
