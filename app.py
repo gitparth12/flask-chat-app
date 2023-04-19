@@ -9,12 +9,11 @@ from flask_login import (LoginManager, current_user, login_required,
 from flask_socketio import SocketIO, join_room, leave_room
 from pymongo.errors import DuplicateKeyError
 
-from dictDB import DB
-
 from db import (add_room_members, get_messages, get_room, get_room_members,
                 get_rooms_for_user, get_user, is_room_admin, is_room_member,
                 remove_room_members, save_message, save_room, save_user,
                 update_room)
+from dictDB import DB
 from no_sql_db import DB, Table
 
 app = Flask(__name__)
@@ -57,7 +56,8 @@ def get_fn():
 
 @app.route("/chats")
 def chats():
-    friends = ["test1", "test2", "test3", "test4", "test5"]
+    # friends = ["test1", "test2", "test3", "test4", "test5"]
+    friends = db.get_friend_list(db.current_user)
     # if current_user.is_authenticated:
     #     rooms = get_rooms_for_user(current_user.username)
     return render_template("chats.html", friends=friends)
