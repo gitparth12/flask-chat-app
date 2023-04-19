@@ -231,6 +231,12 @@ class DB():
                         table = Table(name, *table_fields)
                         table.entries = data
                         self.tables[name] = table
+    
+    def signup(self, username, chatKey):
+        self.add_table(username, "friend", "chatKey")
+        self.create_table_entry(username, [username, chatKey])
+        self.export_JSON()
+        
 # Our global database 
 # Invoke this as needed
 database = DB()
