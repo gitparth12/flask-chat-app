@@ -68,7 +68,7 @@ class DB:
                 return True
         return False
 
-    def get_friend_list(self, username):
+    def get_friends(self, username):
         """
         Creates a list of a given users friends
         """
@@ -76,9 +76,9 @@ class DB:
             if os.path.splitext(filename)[0] == username:
                 with open("db/" + filename) as f:
                     data = json.load(f)
-                friends = [item[0] for item in data if item[0] != username]
-                print(friends)
-                return friends
+                data = {k: v for (k, v) in data if k != username}
+                print(data)
+                return data
         return False
 
     def new_chat(self, username, friend_name):

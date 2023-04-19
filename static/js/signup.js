@@ -1,6 +1,6 @@
 // var fs = require('fs');
 
-var form = document.getElementById("message_input_form");
+var form = document.getElementById("signup_form");
 form.onsubmit = function(e) {
     e.preventDefault();
 

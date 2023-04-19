@@ -1,8 +1,36 @@
+const username = localStorage.getItem("username");
+const userPassword = localStorage.getItem("userPassword");
+
+var form = document.getElementById("login_form");
+form.onsubmit = function(e) {
+    e.preventDefault();
+
+    let friend_username = document.getElementById("friend_username").value;
+    var response = postData({"username": username, "friend_username": friend_username});
+}
 
 //var userPassword = localStorage.getItem('userPassword');
 alert(userPassword);
 
+var friends_promise = postData({ "operation": "get_messages" });
+friends_promise.then(function(friends) {
 
+});
+
+function make_button(friend_username) {
+    var button = document.createElement('button');
+    button.innerHTML = friend_username;
+    const area = document.getElementById('chat_buttons');
+    area.appendChild(button);
+    button.addEventListener("click", function() {
+        const data = { "operation": "get_ownChatKey", "friend_username": friend_username };
+        var response = postData(data);
+        response.then((result) => alert(result));
+
+        localStorage.setItem('chatKey', password);
+        return window.location.href = "/chats";
+    });
+}
 
 function encryptStringWithKey(key, plaintext) {
     const iv = CryptoJS.lib.WordArray.random(16); // generate a random IV

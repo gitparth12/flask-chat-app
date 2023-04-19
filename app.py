@@ -56,10 +56,10 @@ def get_fn():
 @app.route("/chats")
 def chats():
     # friends = ["test1", "test2", "test3", "test4", "test5"]
-    friends = db.get_friend_list(db.current_user)
+    friends = db.get_friends(db.current_user)
     # if current_user.is_authenticated:
     #     rooms = get_rooms_for_user(current_user.username)
-    return render_template("chats.html", friends=friends)
+    return render_template("chats.html")
 
 
 @app.route("/add-friend", methods=["POST"])

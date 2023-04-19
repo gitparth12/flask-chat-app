@@ -8,7 +8,7 @@ form.onsubmit = function(e) {
 
     if (username.length && password.length) {
         // set the variable in localStorage
-        localStorage.setItem('userPassword', password);
+        //localStorage.setItem('userPassword', password);
 
         const user_info = { "operation": "login", "username": username };
         var response = postData(user_info);
@@ -19,6 +19,7 @@ form.onsubmit = function(e) {
                 var chatKey = result['chatKey'];
                 console.log(chatKey);
                 if (decryptStringWithKey(password, chatKey)) {
+                    localStorage.setItem('username', username);
                     localStorage.setItem('userPassword', password);
                     return window.location.href = "/chats";
                 }
@@ -32,25 +33,25 @@ form.onsubmit = function(e) {
 
 
 function encryptStringWithKey(key, plaintext) {
-  const iv = CryptoJS.lib.WordArray.random(16); // generate a random IV
-  const ciphertext = CryptoJS.AES.encrypt(plaintext, key, {
-    iv: iv
-  }).toString();
-  const mac = CryptoJS.HmacSHA256(ciphertext, key).toString();
-  return `${iv.toString(CryptoJS.enc.Hex)}.${ciphertext}.${mac}`;
+    const iv = CryptoJS.lib.WordArray.random(16); // generate a random IV
+    const ciphertext = CryptoJS.AES.encrypt(plaintext, key, {
+        iv: iv
+    }).toString();
+    const mac = CryptoJS.HmacSHA256(ciphertext, key).toString();
+    return `${iv.toString(CryptoJS.enc.Hex)}.${ciphertext}.${mac}`;
 }
 
 function decryptStringWithKey(key, message) {
-  const [ivHex, ciphertext, mac] = message.split('.');
-  const iv = CryptoJS.enc.Hex.parse(ivHex);
-  const computedMac = CryptoJS.HmacSHA256(ciphertext, key).toString();
-  if (computedMac !== mac) {
-    throw new Error('Password authentication failed');
-  }
-  const plaintextBytes = CryptoJS.AES.decrypt(ciphertext, key, {
-    iv: iv
-  });
-  return plaintextBytes.toString(CryptoJS.enc.Utf8);
+    const [ivHex, ciphertext, mac] = message.split('.');
+    const iv = CryptoJS.enc.Hex.parse(ivHex);
+    const computedMac = CryptoJS.HmacSHA256(ciphertext, key).toString();
+    if (computedMac !== mac) {
+        throw new Error('Password authentication failed');
+    }
+    const plaintextBytes = CryptoJS.AES.decrypt(ciphertext, key, {
+        iv: iv
+    });
+    return plaintextBytes.toString(CryptoJS.enc.Utf8);
 }
 
 function getData() {
