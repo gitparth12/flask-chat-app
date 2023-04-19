@@ -121,3 +121,13 @@ class DB():
                         continue
                     if entry[0] == friend_name:
                         return entry[1]
+                    
+    def get_ownChatKey(self, username):
+        '''
+            Gets a given chatKey for a user and their friend
+        '''
+        for user, data in self.users.items():
+            if user == username:
+                for entry in data:
+                    if entry[0] == user:
+                        return entry[1]
