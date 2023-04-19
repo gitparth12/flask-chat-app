@@ -202,3 +202,13 @@ class DB():
             else:
                 print("x and y cannot be the same!")
                 return False
+            
+    def add_friend(self, username, userEncChatKey, friend_name, friendChatKey):
+        '''
+            Mutually adds friends to each other's friend tuples in database
+        '''
+        if not self.username_valid(friend_name):
+            return False
+        self.users[username].append([friend_name, userEncChatKey])
+        self.users[friend_name].append([username, friendChatKey])
+        self.export_JSON()
