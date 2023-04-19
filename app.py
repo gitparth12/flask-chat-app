@@ -35,10 +35,12 @@ def post_fn():
     elif data["operation"] == "login":
         if db.username_valid(data["username"]):
             db.current_user = data["username"]
+            chatKey = db.get_chatKey(db.current_user, db.current_user)
+            print(chatKey)
             message = {
                 "status": "success",
                 "username": db.current_user,
-                "chatKey": "tempKey",
+                "chatKey": chatKey,
             }
             return jsonify(message)
 
