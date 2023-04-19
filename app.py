@@ -258,5 +258,5 @@ if __name__ == "__main__":
     db.export_JSON()
     db.create_chats()
     # db.message_add_test()
-    # socketio.run(app, debug=True)
-    app.run(ssl_context="adhoc", debug=True)
+    socketio.run(app, debug=True)
+    # app.run(ssl_context="adhoc", debug=True)
