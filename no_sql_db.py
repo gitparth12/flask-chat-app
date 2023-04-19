@@ -69,10 +69,10 @@ class DB():
         self.tables = {}
 
         # Setup your tables
-        self.add_table('A', "friends", "chatKey")
-        self.add_table('B', "friends", "chatKey")
-        self.add_table('C', "friends", "chatKey")
-        self.add_table('D', "friends", "chatKey")
+        self.add_table('A', "friend", "chatKey")
+        self.add_table('B', "friend", "chatKey")
+        self.add_table('C', "friend", "chatKey")
+        self.add_table('D', "friend", "chatKey")
         return
 
     def add_table(self, table_name, *table_fields):
