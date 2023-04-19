@@ -147,7 +147,8 @@ def create_room():
             room_id = save_room(room_name, current_user.username)
             if current_user.username in usernames:
                 usernames.remove(current_user.username)
-            add_room_members(room_id, room_name, usernames, current_user.username)
+            add_room_members(room_id, room_name, usernames,
+                             current_user.username)
             return redirect(url_for("view_room", room_id=room_id))
         else:
             message = "Failed to create room"
@@ -172,8 +173,10 @@ def edit_room(room_id):
             new_members = [
                 username.strip() for username in request.form.get("members").split(",")
             ]
-            members_to_add = list(set(new_members) - set(existing_room_members))
-            members_to_remove = list(set(existing_room_members) - set(new_members))
+            members_to_add = list(
+                set(new_members) - set(existing_room_members))
+            members_to_remove = list(
+                set(existing_room_members) - set(new_members))
             if len(members_to_add):
                 add_room_members(
                     room_id, room_name, members_to_add, current_user.username
@@ -221,9 +224,18 @@ def get_older_messages(room_id):
     else:
         return "Room not found", 404
 
-@socketio.on("signup")
+
+@socketio.on("attempt_signup")
 def attempt_signup(data):
-    return render_template("index.html");
+    # return render_template('login.html');
+    print(data)
+    socketio.emit('receive', "Didn't work")
+
+
+@socketio.on("attempt_login")
+def attempt_login(data):
+    pass
+
 
 @socketio.on("send_message")
 def handle_send_message_event(data):
@@ -239,14 +251,16 @@ def handle_send_message_event(data):
 
 @socketio.on("join_room")
 def handle_join_room_event(data):
-    app.logger.info("{} has joined the room {}".format(data["username"], data["room"]))
+    app.logger.info("{} has joined the room {}".format(
+        data["username"], data["room"]))
     join_room(data["room"])
     socketio.emit("join_room_announcement", data, room=data["room"])
 
 
 @socketio.on("leave_room")
 def handle_leave_room_event(data):
-    app.logger.info("{} has left the room {}".format(data["username"], data["room"]))
+    app.logger.info("{} has left the room {}".format(
+        data["username"], data["room"]))
     leave_room(data["room"])
     socketio.emit("leave_room_announcement", data, room=data["room"])
 

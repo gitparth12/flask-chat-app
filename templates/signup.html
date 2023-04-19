@@ -40,7 +40,7 @@
     <div class="signup-box">
         <main>
             <h2>Create an Account</h2>
-            <form id="message_input_form" method="post" role="form">
+            <form id="message_input_form">
                 <div class="form-group">
                     <label for="username">Username</label>
                     <input type="text" name="username" id="username_input">
@@ -54,13 +54,14 @@
         </main>
     </div>
 </body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js"></script>
 <script>
     const socket = io.connect("http://127.0.0.1:5000");
 
+    alert("something");
     socket.on('connect', function () {
 
-        document.getElementById('message_input_form').onsubmit = function (e) {
-            e.preventDefault();
+        document.getElementById('message_input_form').onsubmit = function () {
 
             let username = document.getElementById('username_input').value;
             let password = document.getElementById('password_input').value;
@@ -70,22 +71,18 @@
             var encrypted_chatKey = CryptoJS.AES.encrypt(chatKey, password).toString();
             alert(encrypted_chatKey);
             if (username.length) {
-                socket.emit('signup', {
+                socket.emit('attempt_signup', {
                     username: username,
                     message: message
-                })
+                });
             }
-            message_input.value = '';
-            message_input.focus();
         }
     });
 
-    socket.on('status', function(status) {
-        alert(status);
-        if (status === 'success') {
-            {{ url_for('login') }};
-        }
-    }
+    socket.on('receive', function(data) {
+        alert(data);
+    });
+
 </script>
 
 </html>
