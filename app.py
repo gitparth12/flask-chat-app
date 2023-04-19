@@ -32,8 +32,12 @@ def home():
 def post_fn():
     data = request.get_json()
     data = jsonify(data)
-    print(data.json)
-    return data
+    # print(type(data.json))
+    message = {"status": "success"}
+    if data.json["operation"] == "signup":
+        return redirect(url_for("login"))
+    elif data.json["operation"] == "login":
+        return jsonify(message)
 
 
 @app.route("/get", methods=["GET"])
@@ -87,22 +91,22 @@ def view_chat(friends: list, friend: str):
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    if current_user.is_authenticated:
-        print("authenticated somehow")
-        return redirect(url_for("home"))
+    # if current_user.is_authenticated:
+    #     print("authenticated somehow")
+    #     return redirect(url_for("home"))
 
-    message = ""
-    if request.method == "POST":
-        username = request.form.get("username")
-        password_input = request.form.get("password")
-        user = get_user(username)
+    # message = ""
+    # if request.method == "POST":
+    #     username = request.form.get("username")
+    #     password_input = request.form.get("password")
+    #     user = get_user(username)
 
-        if user and user.check_password(password_input):
-            login_user(user)
-            return redirect(url_for("chats"))
-        else:
-            message = "Failed to login!"
-    return render_template("login.html", message=message)
+    #     if user and user.check_password(password_input):
+    #         login_user(user)
+    #         return redirect(url_for("chats"))
+    #     else:
+    #         message = "Failed to login!"
+    return render_template("login.html")
 
 
 @app.route("/signup", methods=["GET", "POST"])
@@ -110,20 +114,20 @@ def signup():
     #   if current_user.is_authenticated:
     #       return redirect(url_for('home'))
 
-    message = ""
-    if request.method == "POST":
-        username = request.form.get("username")
-        email = request.form.get("email")
-        password = request.form.get("password")
-        try:
-            save_user(username, email, password)
-            if current_user.is_authenticated:
-                return redirect(url_for("home"))
-            else:
-                return redirect(url_for("login"))
-        except DuplicateKeyError:
-            message = "User already exists!"
-    return render_template("signup.html", message=message)
+    # message = ""
+    # if request.method == "POST":
+    #     username = request.form.get("username")
+    #     email = request.form.get("email")
+    #     password = request.form.get("password")
+    #     try:
+    #         save_user(username, email, password)
+    #         if current_user.is_authenticated:
+    #             return redirect(url_for("home"))
+    #         else:
+    #             return redirect(url_for("login"))
+    #     except DuplicateKeyError:
+    #         message = "User already exists!"
+    return render_template("signup.html")
 
 
 @app.route("/logout/")
