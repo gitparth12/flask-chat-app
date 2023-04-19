@@ -15,6 +15,7 @@ form.onsubmit = function(e) {
 
         response.then(function(result) {
             if (result['status'] === 'success') {
+                console.log(result['chatKey']);
                 return window.location.href = "/chats";
             }
             else {

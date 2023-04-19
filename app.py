@@ -31,13 +31,15 @@ def home():
 @app.route("/post", methods=["POST"])
 def post_fn():
     data = request.get_json()
-    data = jsonify(data)
+    data = jsonify(data).json
     # print(type(data.json))
-    message = {"status": "success"}
-    if data.json["operation"] == "signup":
+    if data["operation"] == "signup":
+        db.signup(data["username"], data["chatKey"])
         return redirect(url_for("login"))
-    elif data.json["operation"] == "login":
-        return jsonify(message)
+    elif data["operation"] == "login":
+        if db.username_valid(data["username"]):
+            message = {"status": "success", "chatKey": "tempKey"}
+            return jsonify(message)
 
 
 @app.route("/get", methods=["GET"])
