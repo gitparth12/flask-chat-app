@@ -70,6 +70,7 @@ class DB:
 
     def __init__(self):
         self.tables = {}
+        self.current_user = None
 
         # Setup your tables
         # self.add_table("A", "friend", "chatKey")

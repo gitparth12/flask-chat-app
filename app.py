@@ -38,7 +38,12 @@ def post_fn():
         return redirect(url_for("login"))
     elif data["operation"] == "login":
         if db.username_valid(data["username"]):
-            message = {"status": "success", "chatKey": "tempKey"}
+            db.current_user = data["username"]
+            message = {
+                "status": "success",
+                "username": db.current_user,
+                "chatKey": "tempKey",
+            }
             return jsonify(message)
 
 
