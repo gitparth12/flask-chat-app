@@ -207,8 +207,20 @@ class DB():
         '''
             Mutually adds friends to each other's friend tuples in database
         '''
+        taggedChatKey = 'catchmeifyoucan' + friendChatKey
         if not self.username_valid(friend_name):
             return False
         self.users[username].append([friend_name, userEncChatKey])
         self.users[friend_name].append([username, friendChatKey])
         self.export_JSON()
+
+    def find_friends(self, username):
+        '''
+            Finds pending friends
+        '''
+        pendingFriends = []
+        for tuple in self.users[username]:
+            if tuple[1].startswith('catchmeifyoucan'):
+                tuple[1] = tuple[1][len('catchmeifyoucan'):]
+                pendingFriends.append(tuple)
+        return pendingFriends
