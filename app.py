@@ -203,7 +203,12 @@ def load_user(username):
 
 if __name__ == '__main__':
     db = DB.get_instance()
-    db.export_JSON()
+    #db.export_JSON()
+    #db.message_add_test('chats/lukeandparth.json')
+    print(db.username_valid('A'))
+    print(db.username_valid('E'))
+    db.get_friend_list('A')
+    #db.new_chat("luke", "parth")
+    db.get_friend_list('A')
     db.create_chats()
-    #db.message_add_test()
     socketio.run(app, debug=True)
