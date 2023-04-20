@@ -5,6 +5,25 @@
     <meta charset="UTF-8">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/header.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.9-1/crypto-js.js"></script>
+    <style>
+        .add-friend-box {
+            margin: 0;
+            position: absolute;
+            top: 23%;
+            left: 50%;
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+        .chats-list {
+            margin: 0;
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            -ms-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+        }
+    </style>
 </head>
 
 <body>
@@ -39,7 +58,8 @@
     {% endif %}
     -->
     <section>
-        <h2>Add Friend</h2>     
+        <div class="add-friend-box">
+            <h3>Add a Friend</h3>     
             <form id="add_friend_form"> 
                 <div class="form-group">
                     <label for="username">Username</label>
@@ -47,9 +67,10 @@
                 </div>
                 <button id="button" type="submit">Add</button>
             </form>
+        </div>
     </section>
 
-    <section class="chat-list">
+    <section class="chats-list">
         <div class="container" id="chat_buttons">
             <h2>Chat List</h2>
             <ul>

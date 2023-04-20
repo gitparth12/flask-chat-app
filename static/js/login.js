@@ -1,31 +1,50 @@
-var form = document.getElementById("message_input_form");
+var form = document.getElementById("login_form");
+
 form.onsubmit = function(e) {
     e.preventDefault();
 
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
-    alert(username);
 
     if (username.length && password.length) {
         // set the variable in localStorage
         //localStorage.setItem('userPassword', password);
 
         const user_info = { "operation": "login", "username": username };
-        var response = postData(user_info);
+        var response = postData({ "operation": "login", "username": username });
 
         response.then(function(result) {
             console.log(result);
             if (result['status'] === 'success') {
                 var chatKey = result['chatKey'];
                 console.log(chatKey);
-                if (decryptStringWithKey(password, chatKey)) {
-                    localStorage.setItem('username', username);
-                    localStorage.setItem('userPassword', password);
-                    return window.location.href = "/chats";
+                if (decryptStringWithKey(password, chatKey) !== "invalid") {
+                    result["pending_friends"].forEach(function(friend_tuple) {
+                        friend_tuple[1] = encryptStringWithKey(password, friend_tuple[1]).toString();
+                    });
+                    let sendEncryptedPending = postData({
+                        "operation": "update_pending",
+                        "username": username,
+                        "pending_friends": result["pending_friends"]
+                    });
+                    sendEncryptedPending.then(function(result) {
+                        if (result["status"] === "success") {
+                            console.log(result["pending_friends"]);
+                            localStorage.setItem('username', username);
+                            localStorage.setItem('userPassword', password);
+                            return window.location.href = "/chats";
+                        }
+                        else {
+                            alert("Couldn't add pending friends");
+                        }
+                    });
                 }
                 else {
-                    alert("Couldn't log in, please check details and try again.");
+                    alert("Invalid password.");
                 }
+            }
+            else {
+                alert("User does not exist.");
             }
         });
     }
@@ -33,8 +52,9 @@ form.onsubmit = function(e) {
 
 
 function encryptStringWithKey(key, plaintext) {
+    const fixedSalt = '$2b$10$AbcDefGhIjKlmnoPqrst.';
     const iv = CryptoJS.lib.WordArray.random(16); // generate a random IV
-    const ciphertext = CryptoJS.AES.encrypt(plaintext, key, {
+    const ciphertext = CryptoJS.AES.encrypt(plaintext, key+fixedSalt, {
         iv: iv
     }).toString();
     const mac = CryptoJS.HmacSHA256(ciphertext, key).toString();
@@ -48,7 +68,8 @@ function decryptStringWithKey(key, message) {
     if (computedMac !== mac) {
         throw new Error('Password authentication failed');
     }
-    const plaintextBytes = CryptoJS.AES.decrypt(ciphertext, key, {
+    const fixedSalt = '$2b$10$AbcDefGhIjKlmnoPqrst.';
+    const plaintextBytes = CryptoJS.AES.decrypt(ciphertext, key+fixedSalt, {
         iv: iv
     });
     return plaintextBytes.toString(CryptoJS.enc.Utf8);

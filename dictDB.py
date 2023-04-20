@@ -77,18 +77,21 @@ class DB:
                 with open("db/" + filename) as f:
                     data = json.load(f)
                 data = {k: v for (k, v) in data if k != username}
-                print(data)
                 return data
-        return False
+        return {}
 
     def new_chat(self, username, friend_name):
         """
         Creates a new chat between 2 users
         """
-        data = {"messages": []}
+        data = []
         json_data = json.dumps(data, indent=2)
-        with open(f"chats/{username}and{friend_name}.json", "w") as f:
-            f.write(json_data)
+        if self.alphabetical(username, friend_name):
+            with open(f"chats/{username}and{friend_name}.json", "w") as f:
+                f.write(json_data)
+        else:
+            with open(f"chats/{friend_name}and{username}.json", "w") as f:
+                f.write(json_data)
 
     def import_JSON(self):
         """
@@ -114,17 +117,138 @@ class DB:
         for user, data in self.users.items():
             if user == username:
                 for entry in data:
-                    if entry[0] == username:
+                    if entry[0] == user:
                         continue
                     if entry[0] == friend_name:
                         return entry[1]
 
     def get_ownChatKey(self, username):
         """
-        Gets a given chatKey for a user and their friend
+        Gets a given chatKey for a user
         """
         for user, data in self.users.items():
             if user == username:
                 for entry in data:
                     if entry[0] == username:
                         return entry[1]
+
+    def get_messages(self, username, friend_name):
+        """
+        Gets the messages and splits the usernames from the messages
+        returns a list of tuples such that [[username, message], [username, message]]
+        """
+        namedMessages = []
+        try:
+            if self.alphabetical(username, friend_name):
+                with open(f"chats/{username}and{friend_name}.json", "r") as f:
+                    existing_messages = json.load(f)
+                    for msg in existing_messages:
+                        namedMessages.append(msg.split(".", 1))
+            else:
+                with open(f"chats/{friend_name}and{username}.json", "r") as f:
+                    existing_messages = json.load(f)
+                    for msg in existing_messages:
+                        namedMessages.append(msg.split(".", 1))
+            return namedMessages
+        except FileNotFoundError:
+            return []
+
+    def add_msg_to_chat(self, username, friend_name, message):
+        """
+        Adds a message to a chat between username and friend_name,
+        where username is the user who sent the message
+        """
+        usrMsg = [username + "." + message]
+        if self.alphabetical(username, friend_name):
+            try:
+                with open(f"chats/{username}and{friend_name}.json", "r") as f:
+                    existing_messages = json.load(f)
+            except FileNotFoundError:
+                return False
+            existing_messages.extend(usrMsg)
+            with open(f"chats/{username}and{friend_name}.json", "w") as f:
+                json.dump(existing_messages, f)
+        else:
+            try:
+                with open(f"chats/{friend_name}and{username}.json", "r") as f:
+                    existing_messages = json.load(f)
+            except FileNotFoundError:
+                return False
+            existing_messages.extend(usrMsg)
+            with open(f"chats/{friend_name}and{username}.json", "w") as f:
+                json.dump(existing_messages, f)
+        return True
+
+    def alphabetical(self, x, y):
+        """
+        Returns True if x is first alphabetically, False if y is.
+        """
+        for i in range(min(len(x), len(y))):
+            if x[i] < y[i]:
+                # {x} comes before {y} alphabetically
+                return True
+            elif x[i] > y[i]:
+                # {y} comes before {x} alphabetically"
+                return False
+        else:
+            # if the loop completes without breaking, the strings are equal up to the length of the shorter string
+            if len(x) < len(y):
+                # {x} comes before {y} alphabetically"
+                return True
+            elif len(x) > len(y):
+                # {y} comes before {x} alphabetically"
+                return False
+            else:
+                print("x and y cannot be the same!")
+                return False
+
+    def add_friend(self, username, userEncChatKey, friend_name, friendChatKey):
+        """
+        Mutually adds friends to each other's friend tuples in database
+        """
+        taggedChatKey = "catchmeifyoucan" + friendChatKey
+        if not self.username_valid(friend_name):
+            return False
+        self.users[username].append([friend_name, userEncChatKey])
+        self.users[friend_name].append([username, taggedChatKey])
+        self.export_JSON()
+        return True
+
+    def find_friends(self, username):
+        """
+        Finds pending friends
+        """
+        pendingFriends = []
+        for tuple in self.users[username]:
+            if tuple[1].startswith("catchmeifyoucan"):
+                tuple[1] = tuple[1][len("catchmeifyoucan") :]
+                pendingFriends.append(tuple)
+        if len(pendingFriends) == 0:
+            return []
+        else:
+            return pendingFriends
+
+    def get_chat_filename(self, username, friend_username):
+        """
+        Returns the name of the file containing chats between
+        username and friend_username, without the extension.
+        """
+        if self.alphabetical(username, friend_username):
+            return f"{username}and{friend_username}"
+        else:
+            return f"{friend_username}and{username}"
+
+    def update_chatKeys(self, username, tuple_list):
+        for tuple in tuple_list:
+            for entry in self.users[username]:
+                if entry[1] == tuple[1]:
+                    entry = tuple
+                    self.new_chat(username, tuple[0])
+        self.export_JSON()
+
+
+if __name__ == "__main__":
+    db = DB.get_instance()
+    db.import_JSON()
+    db.export_JSON()
+    db.new_chat("admin", "test")

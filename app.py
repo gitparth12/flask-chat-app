@@ -28,23 +28,65 @@ def home():
 @app.route("/post", methods=["POST"])
 def post_fn():
     data = request.get_json()
+    if data is None:
+        return jsonify({"status": "failure"})
     data = jsonify(data).json
+    print(f"data: {data}")
+    operation = data["operation"]
     # print(type(data.json))
-    if data["operation"] == "signup":
+    if operation == "signup":
         db.signup(data["username"], data["chatKey"])
         return redirect(url_for("login"))
-    elif data["operation"] == "login":
+    elif operation == "login":
         if db.username_valid(data["username"]):
             db.current_user = data["username"]
-            print(db.current_user)
             chatKey = db.get_ownChatKey(db.current_user)
-            print(chatKey)
+            pending_friends = db.find_friends(data["username"])
+            # print(pending_friends)
             message = {
                 "status": "success",
                 "username": db.current_user,
                 "chatKey": chatKey,
+                "pending_friends": pending_friends,
             }
             return jsonify(message)
+        return jsonify({"status": "failure"})
+    elif operation == "get_messages":
+        messages = db.get_messages(data["username"], data["friend_username"])
+        return jsonify(messages)
+    elif operation == "send_message":
+        if db.add_msg_to_chat(
+            data["username"], data["friend_username"], data["message"]
+        ):
+            return jsonify({"status": "success"})
+        else:
+            return jsonify({"status": "failure"})
+    elif operation == "update_pending":
+        db.update_chatKeys(data["username"], data["pending_friends"])
+        return jsonify({"status": "success"})
+    elif operation == "get_friends":
+        friends = db.get_friends(data["username"])
+        if friends:
+            friends["status"] = "success"
+            return jsonify(friends)
+        else:
+            message = {
+                "status": "failure",
+            }
+            return jsonify(message)
+    elif operation == "add_friend":
+        if db.add_friend(
+            data["username"],
+            data["encrypted_key"],
+            data["friend_username"],
+            data["chat_key"],
+        ):
+            return jsonify({"status": "success"})
+        return jsonify({"status": "failure"})
+    elif operation == "get_ChatKey":
+        chatKey = db.get_chatKey(data["username"], data["friend_username"])
+        filename = db.get_chat_filename(data["username"], data["friend_username"])
+        return jsonify({"status": "success", "chatKey": chatKey, "filename": filename})
 
 
 @app.route("/get", methods=["GET"])
@@ -76,9 +118,8 @@ def add_friend_route():
         return "Failed to add friend", 500
 
 
-@app.route("/chats/<friend>/")
-@login_required
-def view_chat(friends: list, friend: str):
+@app.route("/chats/<username>/<friend_username>")
+def open_chat(username, friend_username):
     # room = get_room(room_id)
     # if room and is_room_member(room, current_user.username):
     #     room_members = get_room_members(room_id)  # should return a list of usernames
@@ -88,13 +129,10 @@ def view_chat(friends: list, friend: str):
     #                            messages=messages)
     # else:
     #     return "Room not found", 404
-    if current_user.is_authenticated and friend in friends:
-        messages = ["first message", "second message", "third message"]
-        return render_template(
-            "view_chat.html", friend_username=friend, messages=messages
-        )
-    else:
-        print("view_chat didn't work :(")
+    print(username, friend_username)
+    return render_template(
+        "open_chat.html", username=username, friend_username=friend_username
+    )
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -279,6 +317,6 @@ if __name__ == "__main__":
     ####### db.add_table("Egg", "friend", "chatKey")
     ####### db.create_table_entry("Egg", ["A", 12345])
     db.export_JSON()
-    db.create_chats()
+    # db.create_chats()
 
-    app.run(ssl_context="adhoc", debug=True, port=sys.argv[1])
+    app.run(ssl_context=("cert.pem", "key.pem"), debug=True, port=sys.argv[1])

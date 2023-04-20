@@ -44,8 +44,9 @@ form.onsubmit = function(e) {
 */
 
 function encryptStringWithKey(key, plaintext) {
+    const fixedSalt = '$2b$10$AbcDefGhIjKlmnoPqrst.';
     const iv = CryptoJS.lib.WordArray.random(16); // generate a random IV
-    const ciphertext = CryptoJS.AES.encrypt(plaintext, key, {
+    const ciphertext = CryptoJS.AES.encrypt(plaintext+fixedSalt, key, {
         iv: iv
     }).toString();
     const mac = CryptoJS.HmacSHA256(ciphertext, key).toString();
@@ -62,7 +63,8 @@ function decryptStringWithKey(key, message) {
     const plaintextBytes = CryptoJS.AES.decrypt(ciphertext, key, {
         iv: iv
     });
-    return plaintextBytes.toString(CryptoJS.enc.Utf8);
+    const fixedSalt = '$2b$10$AbcDefGhIjKlmnoPqrst.';
+    return plaintextBytes.toString(CryptoJS.enc.Utf8) + fixedSalt;
 }
 
 

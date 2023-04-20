@@ -1,40 +1,66 @@
 const username = localStorage.getItem("username");
 const userPassword = localStorage.getItem("userPassword");
 
-var form = document.getElementById("login_form");
+window.addEventListener("load", function(event) {
+    var response = postData({ "operation": "get_friends", "username": username });
+    response.then(function(result) {
+        for (var key in result) {
+            if (key !== "status") {
+                make_button(key);
+            }
+        }
+    });
+});
+
+var form = document.getElementById("add_friend_form");
 form.onsubmit = function(e) {
     e.preventDefault();
 
-    let friend_username = document.getElementById("friend_username").value;
-    var response = postData({"username": username, "friend_username": friend_username});
+    var friend_username = document.getElementById("friend_username").value;
+    var response = postData({ "operation": "get_friends", "username": username });
+    response.then(function(result) {
+        if (!result.hasOwnProperty(friend_username)) {
+            var chatKey = CryptoJS.lib.WordArray.random(16).toString();
+            var encrypted_chatKey = encryptStringWithKey(userPassword, chatKey);
+            var res = postData({
+                "operation": "add_friend",
+                "username": username,
+                "encrypted_key": encrypted_chatKey,
+                "friend_username": friend_username,
+                "chat_key": chatKey
+            });
+            res.then(function(result) {
+                if (result["status"] === "success") {
+                    alert("Friend added successfully!");
+                    // make_button(friend_username);
+                }
+            });
+        }
+    });
 }
 
-//var userPassword = localStorage.getItem('userPassword');
-alert(userPassword);
-
-var friends_promise = postData({ "operation": "get_messages" });
-friends_promise.then(function(friends) {
-
-});
 
 function make_button(friend_username) {
     var button = document.createElement('button');
     button.innerHTML = friend_username;
-    const area = document.getElementById('chat_buttons');
-    area.appendChild(button);
+    const chat_buttons = document.getElementById('chat_buttons');
+    chat_buttons.appendChild(button);
     button.addEventListener("click", function() {
-        const data = { "operation": "get_ownChatKey", "friend_username": friend_username };
+        const data = { "operation": "get_ChatKey", "username": username, "friend_username": friend_username };
         var response = postData(data);
-        response.then((result) => alert(result));
-
-        localStorage.setItem('chatKey', password);
-        return window.location.href = "/chats";
+        // response.then((result) => alert(result));
+        response.then(function(result) {
+            localStorage.setItem('chatKey', result["chatKey"]);
+            localStorage.setItem('friend_username', friend_username);
+            return window.location.href = `/chats/${username}/${friend_username}`;
+        });
     });
 }
 
 function encryptStringWithKey(key, plaintext) {
+    const fixedSalt = '$2b$10$AbcDefGhIjKlmnoPqrst.';
     const iv = CryptoJS.lib.WordArray.random(16); // generate a random IV
-    const ciphertext = CryptoJS.AES.encrypt(plaintext, key, {
+    const ciphertext = CryptoJS.AES.encrypt(plaintext, key+fixedSalt, {
         iv: iv
     }).toString();
     const mac = CryptoJS.HmacSHA256(ciphertext, key).toString();
@@ -48,7 +74,8 @@ function decryptStringWithKey(key, message) {
     if (computedMac !== mac) {
         throw new Error('Password authentication failed');
     }
-    const plaintextBytes = CryptoJS.AES.decrypt(ciphertext, key, {
+    const fixedSalt = '$2b$10$AbcDefGhIjKlmnoPqrst.';
+    const plaintextBytes = CryptoJS.AES.decrypt(ciphertext, key+fixedSalt, {
         iv: iv
     });
     return plaintextBytes.toString(CryptoJS.enc.Utf8);
@@ -79,13 +106,7 @@ function postData(data) {
         },
         body: JSON.stringify(data),
     }).then((response) => {
-        if (response.redirected) {
-            alert("Signed up successfully!");
-            // return res.json();
-            window.location.replace(response.url);
-        } else {
-            alert("something is wrong");
-        }
+        return response.json();
     }).catch((err) => console.error(err));
     //.then((jsonResponse) => {
     // Log the response data in the console
