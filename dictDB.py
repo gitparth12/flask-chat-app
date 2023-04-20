@@ -156,15 +156,12 @@ class DB():
         '''
         usrMsg = [username + "." + message]
         if self.alphabetical(username, friend_name):
-            # load the existing messages from the file, or create an empty list if the file doesn't exist
             try:
                 with open(f'chats/{username}and{friend_name}.json', 'r') as f:
                     existing_messages = json.load(f)
             except FileNotFoundError:
                 existing_messages = []
-            # append the new messages to the existing list
             existing_messages.extend(usrMsg)
-            # write the updated messages list to the JSON file
             with open('messages.json', 'w') as f:
                 json.dump(existing_messages, f)
         else:
