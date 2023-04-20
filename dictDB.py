@@ -160,18 +160,18 @@ class DB():
                 with open(f'chats/{username}and{friend_name}.json', 'r') as f:
                     existing_messages = json.load(f)
             except FileNotFoundError:
-                existing_messages = []
+                return False
             existing_messages.extend(usrMsg)
-            with open('messages.json', 'w') as f:
+            with open(f'chats/{username}and{friend_name}.json', 'w') as f:
                 json.dump(existing_messages, f)
         else:
             try:
                 with open(f'chats/{friend_name}and{username}.json', 'r') as f:
                     existing_messages = json.load(f)
             except FileNotFoundError:
-                existing_messages = []
+                return False
             existing_messages.extend(usrMsg)
-            with open('messages.json', 'w') as f:
+            with open(f'chats/{friend_name}and{username}.json', 'w') as f:
                 json.dump(existing_messages, f)
 
     def alphabetical(self, x, y):
