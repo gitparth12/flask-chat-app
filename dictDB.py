@@ -26,15 +26,12 @@ class DB():
             os.makedirs('db')
 
         for user, data in self.users.items():
-            # create a filename for the user's JSON file
             filename = f"db/{user}.json"
             if os.path.exists(filename):
                 mode = 'w'
             else:
                 mode = 'x'
-            # open the file for writing
             with open(filename, mode) as f:
-                # write the data to the file
                 json.dump(data, f)
                 
     def create_chats(self):
