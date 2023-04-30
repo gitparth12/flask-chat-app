@@ -42,7 +42,7 @@ def post_fn():
             db.current_user = data["username"]
             chatKey = db.get_ownChatKey(db.current_user)
             pending_friends = db.find_friends(data["username"])
-            # print(pending_friends)
+            print(f"pending friends sent to client: {pending_friends}")
             message = {
                 "status": "success",
                 "username": db.current_user,
@@ -62,6 +62,7 @@ def post_fn():
         else:
             return jsonify({"status": "failure"})
     elif operation == "update_pending":
+        print(f"pending friends update got from client: {data['pending_friends']}")
         db.update_chatKeys(data["username"], data["pending_friends"])
         return jsonify({"status": "success"})
     elif operation == "get_friends":
@@ -102,6 +103,26 @@ def chats():
     # if current_user.is_authenticated:
     #     rooms = get_rooms_for_user(current_user.username)
     return render_template("chats.html")
+
+
+@app.route("/chats/<username>/<friend_username>")
+def open_chat(username, friend_username):
+    return render_template("open_chat.html")
+
+
+@app.route("/signup")
+def signup():
+    return render_template("signup.html")
+
+
+@app.route("/login")
+def login():
+    return render_template("login.html")
+
+
+@login_manager.user_loader
+def load_user(username):
+    return get_user(username)
 
 
 if __name__ == "__main__":

@@ -1,4 +1,3 @@
-import json
 import os
 
 
@@ -13,10 +12,10 @@ class DB:
 
     def __init__(self) -> None:
         self.users = {}
-        self.users["A"] = [("A", 00000), ("B", 12345), ("D", 67890)]
-        self.users["B"] = [("B", 00000), ("A", 12345)]
-        self.users["C"] = [("C", 00000)]
-        self.users["D"] = [("D", 00000), ("A", 67890)]
+        # self.users["A"] = [("A", 00000), ("B", 12345), ("D", 67890)]
+        # self.users["B"] = [("B", 00000), ("A", 12345)]
+        # self.users["C"] = [("C", 00000)]
+        # self.users["D"] = [("D", 00000), ("A", 67890)]
         self.current_user = None
 
     def export_JSON(self):
