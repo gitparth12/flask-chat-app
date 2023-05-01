@@ -6,7 +6,7 @@ form.onsubmit = function(e) {
 
     let username = document.getElementById("username").value;
     let password = document.getElementById("password").value;
-    alert(username);
+    // alert(username);
 
     const cars = [
         { "make": "Porsche", "model": "911S" },
