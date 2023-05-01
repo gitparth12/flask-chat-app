@@ -66,7 +66,8 @@ function decryptStringWithKey(key, message) {
     const iv = CryptoJS.enc.Hex.parse(ivHex);
     const computedMac = CryptoJS.HmacSHA256(ciphertext, key).toString();
     if (computedMac !== mac) {
-        throw new Error('Password authentication failed');
+        alert("Incorrect password");
+        throw new Error("Incorrect password");
     }
     const fixedSalt = '$2b$10$AbcDefGhIjKlmnoPqrst.';
     const plaintextBytes = CryptoJS.AES.decrypt(ciphertext, key+fixedSalt, {

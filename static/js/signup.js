@@ -19,8 +19,7 @@ form.onsubmit = function(e) {
         var encrypted_chatKey = encryptStringWithKey(password, chatKey);
         const user_info = { "operation": "signup", "username": username, "chatKey": encrypted_chatKey };
         var response = postData(user_info);
-        response.then((result) => console.log(result));
-        /*
+        // response.then((result) => console.log(result));
         response.then(function(result) {
             if (result['status'] === 'success') {
                 return window.location.href = "/login";
@@ -29,7 +28,6 @@ form.onsubmit = function(e) {
                 alert('User already exists, please choose a different username');
             }
         });
-        */
     }
 };
 
